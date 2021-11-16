@@ -88,35 +88,32 @@ print()
 ##BONUS
 ###############################################
 ###############################################
-def stepping(p,count,visited):
+def stepping(p,count,visited,result):
     count+=1
-    result = (False, p)
-    filteredEdges = list(filter(lambda x:x[0]==p, plainEdges))
-    print(filteredEdges,count)
-    for e in filteredEdges:
-        visited.append(p)
-        temp = list(map(lambda x:x[1], filteredEdges))
-        print(temp)
-        for v in temp:
-            if(v%2 == 0 and count%2 == 0):
-                return (True, e[1])
-        if e[1] not in visited:
-            stepping(e[1],count,visited)
-    return result
+    visited.append(p)
+    filteredEdges = list(filter(lambda x:x[0]==p, plainEdges)) #print(filteredEdges,count)
+    filterEvenEdges = list(filter(lambda x: x[1]%2 == 0 , filteredEdges))
+    if(filterEvenEdges != [] and count %2 == 0):
+        result.append(filterEvenEdges[0][1])
+    else:
+        for e in filteredEdges:
+            if e[1] not in visited:
+                stepping(e[1],count,visited,result)
+    b = True if result != [] else False
+    return (b, result[0])
 
 def findEvenVertex(p):
     a = None
     #buildGraph()
     # for x in primeVertices:
     #    a =  searchForConnection(x)
-    return(stepping(p, 0,[]))
+    return(stepping(p, 0,[],[]))
     #print(a)
     #print(finalResult)
     #return (a[0] == finalResult,a[1])
 
 def checkFunctionality(p,e):
-    a = bddVertices([p,0])
-    b = bddVertices([e,e])
+    a = bddVertices([p,e])
     c = composeRR2(bDD, bDD)
     return bool(c)
 
