@@ -36,7 +36,7 @@ def bddVertices(v):
         x = '{0:05b}'.format(y)
         a = x[0]+'&'+x[1]+'&'+x[2]+'&'+x[3]+'&'+x[4]
         result.append(expr2bdd(expr(a)))
-        return result
+    return result
         
 # Calls funtions to convert everything to BDDs
 bddEdges(edgesR)
