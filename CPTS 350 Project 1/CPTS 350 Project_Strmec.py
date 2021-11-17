@@ -1,5 +1,5 @@
 # Jocelyn Strmec, id: 11719133
-# APTS 350 - Fall 2021 WSU
+# CPTS 350 - Fall 2021 WSU
 # Symbolic Graph Project
 
 #imports
@@ -47,55 +47,52 @@ verticesPRIME = bddVertices(primeVertices)
 
 # Composes the RR and BDD vars 
 def composeRR(rr1, rr2):
-    x = bddvars('x', 5)
+    x = bddvars('x', 5)#Creates Variables
     y = bddvars('y', 5)
     z = bddvars('z', 10)
     for i in range(0, 5):
-        rr1 = rr1.compose({y[i]: z[i]})
+        rr1 = rr1.compose({y[i]: z[i]})# Comopses rr1, rr2 into bdd variables
         rr2 = rr2.compose({z[i]: x[i]})
     return (rr1 & rr2).smoothing(z)
 
 # Composes the RR2 and RR2*
 def composeRR2STAR(var):
-    while bool(1):
-        bDD = reduce(lambda x, y: x or y, var) #Reduces list of edgesRR for each bool expression
-        B = bDD or composeRR(bDD, bDD) #Composes RR2* and BDD vars (BDD PE)
-        if B.equivalent(bDD):
-            break
+    bDD = reduce(lambda x, y: x or y, var) #Reduces list of edgesRR for each bool expression
+    B = bDD or composeRR(bDD, bDD) #Composes RR2* and BDD vars (BDD PE)
     return Not(B).smoothing().equivalent(False)
 
 result = composeRR2STAR(edgesRR)
 result1 = composeRR2STAR(verticesEVEN)
 result2 = composeRR2STAR(verticesPRIME)
 
-# C = result1 or result2 or result
-# finalResult = Not(C).smoothing().equivalent(False)
 def computePE(r,r1,r2):
-    PE = result1 and result2 and result
-    finalResult = Not(PE).smoothing().equivalent(True)
-    return finalResult
+    PE = result1 and result2 and result # PE = result1 or result2 or result
+    return Not(PE).smoothing().equivalent(True)# Not(PE).smoothing().equivalent(False)
 
 finalResult = computePE(result,result1,result2)
 print()
 print()
-print("StatementA, \'For each node u in [prime], there is a node v in [even] such that \nu can reach v in even number of steps\', is",  finalResult  ,"for all [prime] in G")
+print("StatementA, \n\'For each node u in [prime], there is a node v in [even] such that \nu can reach v in even number of steps\', is",  finalResult  ,"for all [prime] in G")
 print()
 print()
 
 ##BONUS
 ###############################################
 ###############################################
+# This is a recursive function similar to a DFS search that finds a even for a prime to 
+# test the functionality of the BDDs above
 def stepping(p,count,visited,result):
     count+=1
     visited.append(p)
-    filteredEdges = list(filter(lambda x:x[0]==p, plainEdges)) #print(filteredEdges,count)
-    filterEvenEdges = list(filter(lambda x: x[1]%2 == 0 , filteredEdges))
+    filteredEdges = list(filter(lambda x:x[0]==p, plainEdges)) #filters out edges that are out of p #print(filteredEdges,count)
+    filterEvenEdges = list(filter(lambda x: x[1]%2 == 0 , filteredEdges))#filters out even vertices in the edges that are out of p
     if(filterEvenEdges != [] and count %2 == 0):
         result.append(filterEvenEdges[0][1])
     else:
         for e in filteredEdges:
             if e[1] not in visited:
-                stepping(e[1],count,visited,result)
+                stepping(e[1],count,visited,result)# recursive call that checks all edges
+                # out of p if a even number and even count has not been found
     b = True if result != [] else False
     return (b, result[0])
 
@@ -111,12 +108,12 @@ def checkFunctionality(p,e):
     r2 = composeRR2STAR(edgesRR)
     return computePE(r,r1,r2)
 
-testprime = 5  
+testprime = 13  
 a = findEvenVertex(testprime)
 f = checkFunctionality(testprime,a[1])
 print()
 print("BONUS")
-print("The boolean graph with RDD and such and the recursive DFS match:", a[0]) 
+print("The boolean graph with BDD, RR2 and such and the recursive DFS match:", a[0]) 
 print("Based on graph for prime u",testprime,", even v is :", a[1])
 print("The result of testing wether the prime and the even can be reached in a even number of steps in the PE with bool graphs stuff is:",f)
 print()
