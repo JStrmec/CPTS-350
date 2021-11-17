@@ -115,10 +115,10 @@ testprime = 5
 a = findEvenVertex(testprime)
 f = checkFunctionality(testprime,a[1])
 print()
-print()
+print("BONUS")
 print("The boolean graph with RDD and such and the recursive DFS match:", a[0]) 
 print("Based on graph for prime u",testprime,", even v is :", a[1])
-print("The result of testing the prime and the even can be reached in a even number of steps is:",f)
+print("The result of testing wether the prime and the even can be reached in a even number of steps in the PE with bool graphs stuff is:",f)
 print()
 print()
 
