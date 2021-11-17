@@ -42,6 +42,8 @@ def bddVertices(v):
         
 # Calls funtions to convert everything to BDDs
 bddEdges(edgesR)
+print(edgesR)
+print(edgesRR)
 verticesEVEN = bddVertices(evenVertices)
 verticesPRIME = bddVertices(primeVertices)
 
