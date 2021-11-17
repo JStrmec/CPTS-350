@@ -6,30 +6,32 @@
 from pyeda.inter import *
 from functools import reduce
 
-#Graph G nodes
+#Declarations of Variables
 evenVertices = set([x for x in range(30) if x%2 == 0])
-primeVertices = {3,5,7,11,13,17,19,23,29,31}# Why are 1 and 2 not included
+primeVertices = {3,5,7,11,13,17,19,23,29,31}# Why are 1 and 2 not included? They're prime.
 edgesR = []
 plainEdges = []
 
 edgesRR =[]
 verticesEVEN =[]
 verticesPRIME = []
-# Creates Edges that are binary values of corresponding decimal numbers that fit the requirements for an edge
+# Creates Edges that are binary values of corresponding decimal numbers 
+# that fit the requirements for an edge
 for i in range(0,32):
     for j in range(0,32):
         if((i+3)%32 == j%32 or (i+8)%32 == j%32):
             edgesR.append(['{0:05b}'.format(i),'{0:05b}'.format(j)])
             plainEdges.append((i,j))
-# Converts Binary Edge Pairs into BBB expressions
+
+# Converts Binary Edge Pairs into BDD expressions
 def bddEdges(e):
     for x in e:
         a = x[0][0]+'&'+x[0][1]+'&'+x[0][2]+'&'+x[0][3]+'&'+x[0][4]
         b = x[1][0]+'&'+x[1][1]+'&'+x[1][2]+'&'+x[1][3]+'&'+x[1][4]
         c = a + '|'+ b
         edgesRR.append(expr2bdd(expr(c)))
-# Converts Vertixes intp BBB expressions, if s = 'e' it is append to EVENS
-# if s = 'p' it is appended to PRIMES
+
+# Converts Vertices to BDDs expressions
 def bddVertices(v):
     for y in v:
         result  = []
@@ -43,8 +45,8 @@ bddEdges(edgesR)
 verticesEVEN = bddVertices(evenVertices)
 verticesPRIME = bddVertices(primeVertices)
 
-# Composes the RR2* and BDD vars (BDD PE)
-def composeRR2(rr1, rr2):
+# Composes the RR and BDD vars 
+def composeRR(rr1, rr2):
     x = bddvars('x', 5)
     y = bddvars('y', 5)
     z = bddvars('z', 10)
@@ -53,32 +55,27 @@ def composeRR2(rr1, rr2):
         rr2 = rr2.compose({z[i]: x[i]})
     return (rr1 & rr2).smoothing(z)
 
-# print(edgesRR)
-# print(verticesEVEN)
-# print(verticesPRIME)
+# Composes the RR2 and RR2*
+def composeRR2STAR(var):
+    while bool(1):
+        bDD = reduce(lambda x, y: x or y, var) #Reduces list of edgesRR for each bool expression
+        B = bDD or composeRR(bDD, bDD) #Composes RR2* and BDD vars (BDD PE)
+        if B.equivalent(bDD):
+            break
+    return Not(B).smoothing().equivalent(False)
 
-# For all n in primes, does there exists a v in evens such that
-# There exists a path from u to v in even number of steps
-while bool(1):
-    bDD = reduce(lambda x, y: x or y, edgesRR) #Reduces list of edgesRR for each bool expression
-    B = bDD or composeRR2(bDD, bDD) #Composes RR2* and BDD vars (BDD PE)
-    if B.equivalent(bDD):
-        break
-bDD1 = reduce(lambda x, y: x or y, verticesEVEN) #Reduces list of vertices EVEN for each bool expression
-B1 = bDD1 or composeRR2(bDD1, bDD1)
-r1 = B1.equivalent(bDD1)
+result = composeRR2STAR(edgesRR)
+result1 = composeRR2STAR(verticesEVEN)
+result2 = composeRR2STAR(verticesPRIME)
 
-bDD2 = reduce(lambda x, y: x or y, verticesPRIME) #Reduces list of vertices Prime for each bool expression
-B2 = bDD2 or composeRR2(bDD2, bDD2)
-r2 = B2.equivalent(bDD2)
+# C = result1 or result2 or result
+# finalResult = Not(C).smoothing().equivalent(False)
+def computePE(r,r1,r2):
+    PE = result1 and result2 and result
+    finalResult = Not(PE).smoothing().equivalent(True)
+    return finalResult
 
-result = Not(B).smoothing().equivalent(False)
-result1 = Not(B1).smoothing().equivalent(False)
-result2 = Not(B2).smoothing().equivalent(False)
-
-C = result1 or result2 or result
-
-finalResult = Not(C).smoothing().equivalent(False)
+finalResult = computePE(result,result1,result2)
 print()
 print()
 print("StatementA, \'For each node u in [prime], there is a node v in [even] such that \nu can reach v in even number of steps\', is",  finalResult  ,"for all [prime] in G")
@@ -104,20 +101,17 @@ def stepping(p,count,visited,result):
 
 def findEvenVertex(p):
     a = None
-    #buildGraph()
-    # for x in primeVertices:
-    #    a =  searchForConnection(x)
     return(stepping(p, 0,[],[]))
-    #print(a)
-    #print(finalResult)
-    #return (a[0] == finalResult,a[1])
-
+    
 def checkFunctionality(p,e):
-    a = bddVertices([p,e])
-    c = composeRR2(bDD, bDD)
-    return bool(c)
+    a = bddVertices([p])
+    b = bddVertices([e])
+    r = composeRR2STAR(a)
+    r1 = composeRR2STAR(b)
+    r2 = composeRR2STAR(edgesRR)
+    return computePE(r,r1,r2)
 
-testprime = 13  
+testprime = 5  
 a = findEvenVertex(testprime)
 f = checkFunctionality(testprime,a[1])
 print()
