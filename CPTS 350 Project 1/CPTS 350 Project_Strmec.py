@@ -42,8 +42,6 @@ def bddVertices(v):
         
 # Calls funtions to convert everything to BDDs
 bddEdges(edgesR)
-print(edgesR)
-print(edgesRR)
 verticesEVEN = bddVertices(evenVertices)
 verticesPRIME = bddVertices(primeVertices)
 
@@ -66,7 +64,7 @@ def composeRR2STAR(var):
 result = composeRR2STAR(edgesRR)
 result1 = composeRR2STAR(verticesEVEN)
 result2 = composeRR2STAR(verticesPRIME)
-
+# Computes the PE statement there is a prime and an even and that can be reached in even steps in RR2Star
 def computePE(r,r1,r2):
     PE = result1 and result2 and result # PE = result1 or result2 or result
     return Not(PE).smoothing().equivalent(True)# Not(PE).smoothing().equivalent(False)
@@ -117,7 +115,7 @@ print()
 print("BONUS")
 print("The boolean graph with BDD, RR2 and such and the recursive DFS match:", a[0]) 
 print("Based on graph for prime u",testprime,", even v is :", a[1])
-print("The result of testing whether the prime and the even can be reached in a even number of steps in the PE with bool graphs stuff is:",f)
+print("The result of testing wether the prime and the even can be reached in a even number of steps in the PE with bool graphs stuff is:",f)
 print()
 print()
 
