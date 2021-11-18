@@ -108,14 +108,14 @@ def checkFunctionality(p,e):
     r2 = composeRR2STAR(edgesRR)
     return computePE(r,r1,r2)
 
-testprime = 13  
+testprime = 11  ###Change this prime number to test any prime within the set
 a = findEvenVertex(testprime)
 f = checkFunctionality(testprime,a[1])
 print()
 print("BONUS")
 print("The boolean graph with BDD, RR2 and such and the recursive DFS match:", a[0]) 
 print("Based on graph for prime u",testprime,", even v is :", a[1])
-print("The result of testing wether the prime and the even can be reached in a even number of steps in the PE with bool graphs stuff is:",f)
+print("The result of testing whether the prime and the even can be reached in a even number of steps in the PE with bool graphs stuff is:",f)
 print()
 print()
 
